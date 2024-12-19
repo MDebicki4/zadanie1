@@ -1,11 +1,12 @@
 package org.example;
 
+import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.junit.After;
-import org.junit.Before;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import static com.codeborne.selenide.Selenide.*;
 import static org.junit.Assert.*;
+
 
 public class StepDefinitions {
     private int start;
@@ -36,6 +38,9 @@ public class StepDefinitions {
     @Before
     public void beforeTest() {
         logger.info("Rozpoczynam test...");
+        logger.info("This is an info message");
+        logger.error("This is an error message");
+        logger.debug("This is a debug message");
     }
 
     @After
@@ -51,6 +56,10 @@ public class StepDefinitions {
 
     @Given("Otworz przegladarke")
     public void otworzPrzegladarke() {
+        // Logowanie konfiguracji
+        System.out.println("Screenshots enabled: " + Configuration.screenshots);
+        System.out.println("Save page source enabled: " + Configuration.savePageSource);
+        System.out.println("Reports folder: " + Configuration.reportsFolder);
         try {
             logger.info("Otwieram przeglądarkę...");
             Selenide.open("about:blank");
@@ -73,6 +82,7 @@ public class StepDefinitions {
     public void przejdzNaStrone(String url) {
         logger.info("Przechodzę na stronę: {}", url);
         open(url);
+        Selenide.screenshot("test_screenshot");
     }
 
     @Then("Strona glowna jest widoczna")
