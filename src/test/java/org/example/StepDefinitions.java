@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 public class StepDefinitions {
     private int start;
     private int rata;
+    HomePage homePage = new HomePage();
 
     private static final Logger logger = LoggerFactory.getLogger(StepDefinitions.class);
 
@@ -42,10 +43,9 @@ public class StepDefinitions {
     @After
     public void afterTest() {
         try {
-            if (webdriver() != null) {
-                Selenide.closeWebDriver();
-                logger.info("Przeglądarka została zamknięta.");
-            }
+            webdriver();
+            Selenide.closeWebDriver();
+            logger.info("Przeglądarka została zamknięta.");
         } catch (Exception e) {
             logger.error("Wystąpił błąd podczas zamykania przeglądarki.", e);
         }
@@ -62,7 +62,7 @@ public class StepDefinitions {
         } catch (Exception e) {
             logger.error("Błąd podczas otwierania przeglądarki.", e);
             closeBrowserAndReportError(e);
-            throw e; // Rzucenie wyjątku dalej, by test zakończył się błędem
+            throw e;
         }
     }
 
@@ -79,41 +79,42 @@ public class StepDefinitions {
 
     @Then("Strona glowna jest widoczna")
     public void stronaGlownaJestWidoczna() {
-        String title = title();
+        String title = com.codeborne.selenide.Selenide.title();
         logger.info("Sprawdzam tytuł strony głównej: {}", title);
         assertTrue("Strona główna niewidoczna", title != null && !title.isEmpty());
-        $("#didomi-notice-agree-button").should(Condition.visible).click();
-        $("footer").scrollTo();
+
+        homePage.acceptCookies();
         String expectedText = "T‑Mobile";
-        boolean isTextPresent = $("footer").text().contains(expectedText);
+        boolean isTextPresent = homePage.isTextPresentInFooter(expectedText);
+
         if (isTextPresent) {
             logger.info("Tekst '{}' znaleziony w stopce strony", expectedText);
         } else {
             logger.error("Tekst '{}' nie został znaleziony w stopce strony", expectedText);
         }
+
         assertTrue("Tekst '" + expectedText + "' nie został znaleziony w stopce strony!", isTextPresent);
     }
 
     @Given("Z gornej belki wybierz {string}")
     public void zGornejBelkiWybierz(String opcja) {
-        $(By.xpath("//button[contains(.,'" + opcja + "')]")).click();
+        homePage.selectOptionFromTopBar(opcja);
     }
 
     @Then("Widoczna rozwijana lista")
     public void widocznaRozwijanaLista() {
-        SelenideElement element = $$("div.menu-dropdown-submenu").first();
-        String displayStyle = element.getCssValue("display");
-        if ("flex".equals(displayStyle)) {
+        boolean isDropdownVisible = homePage.isDropdownVisible();
+        if (isDropdownVisible) {
             logger.info("Dropdown został rozwinięty.");
         } else {
             logger.error("Dropdown nie został rozwinięty.");
         }
-        assertEquals("Pierwszy dropdown się nie rozwinął", "flex", displayStyle);
+        assertTrue("Pierwszy dropdown się nie rozwinął", isDropdownVisible);
     }
 
     @When("Kliknij {string} z kolumny Bez abonamentu")
     public void kliknijZKolumny(String opcja) {
-        $(By.xpath("(//span[contains(text(), '" + opcja + "')])[2]")).click();
+        homePage.clickOptionFromColumn(opcja);
     }
 
     @Then("Widoczna lista smartfonow")
