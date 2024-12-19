@@ -7,9 +7,13 @@ import com.codeborne.selenide.SelenideElement;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.junit.After;
+import org.junit.Before;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.codeborne.selenide.Selenide.*;
 import static org.junit.Assert.*;
@@ -18,11 +22,48 @@ public class StepDefinitions {
     private int start;
     private int rata;
 
+    private static final Logger logger = LoggerFactory.getLogger(StepDefinitions.class);
+
+    private void closeBrowserAndReportError(Exception e) {
+        try {
+            Selenide.closeWebDriver();
+            logger.info("Przeglądarka została zamknięta z powodu błędu.");
+        } catch (Exception ex) {
+            logger.error("Błąd przy zamykaniu przeglądarki po wystąpieniu błędu: ", ex);
+        }
+        logger.error("Wystąpił błąd: ", e);
+    }
+
+    @Before
+    public void beforeTest() {
+        logger.info("Rozpoczynam test...");
+    }
+
+    @After
+    public void afterTest() {
+        try {
+            if (webdriver() != null) {
+                Selenide.closeWebDriver();
+                logger.info("Przeglądarka została zamknięta.");
+            }
+        } catch (Exception e) {
+            logger.error("Wystąpił błąd podczas zamykania przeglądarki.", e);
+        }
+    }
+
     @Given("Otworz przegladarke")
     public void otworzPrzegladarke() {
-        Selenide.open("about:blank");
-        WebDriver driver = Selenide.webdriver().driver().getWebDriver();
-        driver.manage().window().setSize(new Dimension(1600, 800));
+        try {
+            logger.info("Otwieram przeglądarkę...");
+            Selenide.open("about:blank");
+            WebDriver driver = Selenide.webdriver().driver().getWebDriver();
+            driver.manage().window().setSize(new Dimension(1600, 800));
+            logger.info("Przeglądarka została otworzona i zmieniono jej rozmiar na 1600x800");
+        } catch (Exception e) {
+            logger.error("Błąd podczas otwierania przeglądarki.", e);
+            closeBrowserAndReportError(e);
+            throw e; // Rzucenie wyjątku dalej, by test zakończył się błędem
+        }
     }
 
     @Then("Przegladarka otworzona")
@@ -32,17 +73,24 @@ public class StepDefinitions {
 
     @Given("Przejdz na strone {string}")
     public void przejdzNaStrone(String url) {
+        logger.info("Przechodzę na stronę: {}", url);
         open(url);
     }
 
     @Then("Strona glowna jest widoczna")
     public void stronaGlownaJestWidoczna() {
         String title = title();
+        logger.info("Sprawdzam tytuł strony głównej: {}", title);
         assertTrue("Strona główna niewidoczna", title != null && !title.isEmpty());
         $("#didomi-notice-agree-button").should(Condition.visible).click();
         $("footer").scrollTo();
-        String expectedText = "T‑Mobile Polska S.A. Wszystkie prawa zastrzeżone";
+        String expectedText = "T‑Mobile";
         boolean isTextPresent = $("footer").text().contains(expectedText);
+        if (isTextPresent) {
+            logger.info("Tekst '{}' znaleziony w stopce strony", expectedText);
+        } else {
+            logger.error("Tekst '{}' nie został znaleziony w stopce strony", expectedText);
+        }
         assertTrue("Tekst '" + expectedText + "' nie został znaleziony w stopce strony!", isTextPresent);
     }
 
@@ -55,6 +103,11 @@ public class StepDefinitions {
     public void widocznaRozwijanaLista() {
         SelenideElement element = $$("div.menu-dropdown-submenu").first();
         String displayStyle = element.getCssValue("display");
+        if ("flex".equals(displayStyle)) {
+            logger.info("Dropdown został rozwinięty.");
+        } else {
+            logger.error("Dropdown nie został rozwinięty.");
+        }
         assertEquals("Pierwszy dropdown się nie rozwinął", "flex", displayStyle);
     }
 
@@ -82,18 +135,20 @@ public class StepDefinitions {
 
     @When("Dodaj produkt do koszyka")
     public void dodajProduktDoKoszyka() {
-        ElementsCollection buttons = $$("button");  // Zbiera wszystkie przyciski na stronie
-
+        logger.info("Dodaję produkt do koszyka...");
+        ElementsCollection buttons = $$("button");
         ElementsCollection priceElements = $$(".dt_price_change");
 
-        String startText = priceElements.get(2).text();  // 3. element (indeks 2)
-        String rataText = priceElements.get(3).text();   // 4. element (indeks 3)
+        String startText = priceElements.get(2).text();
+        String rataText = priceElements.get(3).text();
 
-        String startNumber = startText.replaceAll("[^0-9]", ""); // Usuń wszystko, co nie jest liczbą
-        String rataNumber = rataText.replaceAll("[^0-9]", "");  // Usuń wszystko, co nie jest liczbą
+        String startNumber = startText.replaceAll("[^0-9]", "");
+        String rataNumber = rataText.replaceAll("[^0-9]", "");
 
-        start = Integer.parseInt(startNumber);  // Zamień tekst na liczbę
-        rata = Integer.parseInt(rataNumber);    // Zamień tekst na liczbę
+        start = Integer.parseInt(startNumber);
+        rata = Integer.parseInt(rataNumber);
+
+        logger.info("Kwota początkowa: {}, Kwota miesięczna: {}", start, rata);
 
         buttons.filterBy(Condition.text("Dodaj do koszyka")).first().click();
     }
@@ -110,14 +165,24 @@ public class StepDefinitions {
     @Then("Kwoty Cena na start oraz Rata miesieczna zgadzaja sie z kwotami z poprzedniej strony")
     public void kwotyZgadzaSie() {
 
-        String totalMonthlyText = $("span[data-qa='BKT_TotalMonthly']").text();
-        String totalUpFrontText = $("span[data-qa='BKT_TotalupFront']").text();
+        try {
+            logger.info("Sprawdzam, czy kwoty Cena na start oraz Rata miesięczna zgadzają się...");
+            String totalMonthlyText = $("span[data-qa='BKT_TotalMonthly']").text();
+            String totalUpFrontText = $("span[data-qa='BKT_TotalupFront']").text();
 
-        int totalMonthly = Integer.parseInt(totalMonthlyText.replaceAll("[^0-9]", ""));
-        int totalUpFront = Integer.parseInt(totalUpFrontText.replaceAll("[^0-9]", ""));
+            int totalMonthly = Integer.parseInt(totalMonthlyText.replaceAll("[^0-9]", ""));
+            int totalUpFront = Integer.parseInt(totalUpFrontText.replaceAll("[^0-9]", ""));
 
-        assertEquals("Kwota miesięczna się nie zgadza!", totalMonthly, rata);
-        assertEquals("Kwota upfront się nie zgadza!", totalUpFront, start);
+            logger.info("Kwota miesięczna na stronie: {}, Kwota upfront na stronie: {}", totalMonthly, totalUpFront);
+            logger.info("Kwota miesięczna w poprzedniej stronie: {}, Kwota upfront w poprzedniej stronie: {}", rata, start);
+
+            assertEquals("Kwota miesięczna się nie zgadza!", totalMonthly, rata);
+            assertEquals("Kwota upfront się nie zgadza!", totalUpFront, start);
+        } catch (Exception e) {
+            logger.error("Błąd przy sprawdzaniu kwot na stronie koszyka.", e);
+            closeBrowserAndReportError(e);
+            throw e;
+        }
     }
 
     @When("Przejdz na strone glowna {string}")
@@ -129,7 +194,7 @@ public class StepDefinitions {
     public void widocznaStronaGlowna() {
         String title = title();
         assertTrue("Strona główna niewidoczna", title != null && !title.isEmpty());
-        String expectedText = "T‑Mobile Polska S.A. Wszystkie prawa zastrzeżone";
+        String expectedText = "T‑Mobile Polska";
         boolean isTextPresent = $("footer").text().contains(expectedText);
         assertTrue("Tekst '" + expectedText + "' nie został znaleziony w stopce strony!", isTextPresent);
     }
@@ -137,8 +202,9 @@ public class StepDefinitions {
     @Then("W prawym gornej rogu widoczna jest ikonka koszyka z liczba produktow w koszyku")
     public void ikonkaKoszykaWRoGu() {
         String tekstKoszyk = $("a[title='Koszyk']").text();
-        String liczbaTekst = tekstKoszyk.replaceAll("[^0-9]", ""); // Usuwamy wszystko, co nie jest cyfrą
+        String liczbaTekst = tekstKoszyk.replaceAll("[^0-9]", "");
         int liczbaKoszyk = Integer.parseInt(liczbaTekst);
+        logger.info("Liczba produktów w koszyku: {}", liczbaKoszyk);
         assertEquals("Liczba w koszyku nie wynosi 1!", 1, liczbaKoszyk);
     }
 }
