@@ -6,7 +6,7 @@ pipeline {
         jdk 'JDK 17'
     }
         environment {
-            MAVEN_OPTS = '-Dfile.encoding=UTF-8'
+            MAVEN_OPTS = '-Dfile.encoding=UTF8'
         }
 
     stages {
