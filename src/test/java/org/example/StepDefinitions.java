@@ -9,8 +9,6 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.codeborne.selenide.Selenide.*;
 import static org.junit.Assert.*;
@@ -23,7 +21,6 @@ public class StepDefinitions {
     private final ProductPage productPage = new ProductPage();
     private final CartPage cartPage = new CartPage();
 
-    private static final Logger logger = LoggerFactory.getLogger(StepDefinitions.class);
 
     private void closeBrowserAndReportError(Exception e) {
         try {
