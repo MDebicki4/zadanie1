@@ -15,7 +15,7 @@ pipeline {
         stage('Run Tests') {
             steps {
              bat 'java -version'
-                bat 'mvn -v && mvn clean test'
+                bat 'mvn clean test -Dfile.encoding=UTF-8'
             }
         }
     }
