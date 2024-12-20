@@ -29,7 +29,7 @@ pipeline {
                 script {
                     bat """
                     chcp 65001 > nul
-                    set MAVEN_OPTS=-Dfile.encoding=UTF-8
+                    set MAVEN_OPTS=-Dfile.encoding=UTF-8 -Dselenide.browserSize=1920x1080 -Dselenide.headless=true
                     mvn clean test
                     """
                 }
