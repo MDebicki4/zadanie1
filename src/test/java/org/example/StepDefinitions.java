@@ -9,6 +9,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import static com.codeborne.selenide.Selenide.*;
 import static org.junit.Assert.*;
@@ -55,11 +56,17 @@ public class StepDefinitions {
         System.out.println("Save page source enabled: " + Configuration.savePageSource);
         System.out.println("Reports folder: " + Configuration.reportsFolder);
         try {
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("start-maximized"); // Start przeglądarki na pełnym ekranie
+            // Usuwamy headless, aby uruchomić przeglądarkę z GUI
+            options.addArguments("--headless"); // W przypadku problemu usuń tę linię
+
             LoggerUtil.logInfo("Otwieram przeglądarkę...");
             Selenide.open("about:blank");
             WebDriver driver = Selenide.webdriver().driver().getWebDriver();
-            driver.manage().window().setSize(new Dimension(1600, 800));
+            driver.manage().window().setSize(new Dimension(1600, 800)); // Dostosowanie rozmiaru okna
             LoggerUtil.logInfo("Przeglądarka została otworzona i zmieniono jej rozmiar na 1600x800");
+
         } catch (Exception e) {
             LoggerUtil.logError("Błąd podczas otwierania przeglądarki.", e);
             closeBrowserAndReportError(e);
