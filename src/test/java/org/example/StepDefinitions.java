@@ -1,13 +1,11 @@
 package org.example;
 
-import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
@@ -51,10 +49,6 @@ public class StepDefinitions {
 
     @Given("Otworz przegladarke")
     public void otworzPrzegladarke() {
-        // Logowanie konfiguracji
-        System.out.println("Screenshots enabled: " + Configuration.screenshots);
-        System.out.println("Save page source enabled: " + Configuration.savePageSource);
-        System.out.println("Reports folder: " + Configuration.reportsFolder);
         try {
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--headless");
@@ -63,9 +57,7 @@ public class StepDefinitions {
             LoggerUtil.logInfo("Otwieram przeglądarkę...");
             Selenide.open("about:blank");
             WebDriver driver = Selenide.webdriver().driver().getWebDriver();
-            driver.manage().window().setSize(new Dimension(1600, 800));
             LoggerUtil.logInfo("Przeglądarka została otworzona w trybie headless z rozmiarem 1600x800");
-
         } catch (Exception e) {
             LoggerUtil.logError("Błąd podczas otwierania przeglądarki.", e);
             closeBrowserAndReportError(e);
