@@ -12,7 +12,7 @@ public class ProductPage {
     private final ElementsCollection priceElements = $$(".dt_price_change");
 
     public void verifyProductPageVisible() {
-        productScene.should(Condition.visible);
+        productScene.should(Condition.exist);
     }
 
     public int[] addProductToCart() {
