@@ -8,6 +8,8 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import static com.codeborne.selenide.Selenide.*;
 import static org.junit.Assert.*;
@@ -52,9 +54,9 @@ public class StepDefinitions {
         try {
             LoggerUtil.logInfo("Otwieram przeglądarkę...");
             Selenide.open("about:blank");
-            WebDriver driver = Selenide.webdriver().driver().getWebDriver();
+            WebDriver driver = new ChromeDriver(new ChromeOptions().addArguments("--window-size=1600,800"));
             driver.manage().window().setSize(new Dimension(1600, 800));
-            LoggerUtil.logInfo("Przeglądarka została otworzona i zmieniono jej rozmiar na 1600x800");
+
             Dimension currentSize = driver.manage().window().getSize();
             LoggerUtil.logInfo("Aktualna rozdzielczość okna przeglądarki: " +
                     currentSize.getWidth() + "x" + currentSize.getHeight());
