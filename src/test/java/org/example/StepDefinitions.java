@@ -57,15 +57,14 @@ public class StepDefinitions {
         System.out.println("Reports folder: " + Configuration.reportsFolder);
         try {
             ChromeOptions options = new ChromeOptions();
-            options.addArguments("start-maximized"); // Start przeglądarki na pełnym ekranie
-            // Usuwamy headless, aby uruchomić przeglądarkę z GUI
-            options.addArguments("--headless"); // W przypadku problemu usuń tę linię
+            options.addArguments("--headless");
+            options.addArguments("--window-size=1600x800");
 
             LoggerUtil.logInfo("Otwieram przeglądarkę...");
             Selenide.open("about:blank");
             WebDriver driver = Selenide.webdriver().driver().getWebDriver();
-            driver.manage().window().setSize(new Dimension(1600, 800)); // Dostosowanie rozmiaru okna
-            LoggerUtil.logInfo("Przeglądarka została otworzona i zmieniono jej rozmiar na 1600x800");
+            driver.manage().window().setSize(new Dimension(1600, 800));
+            LoggerUtil.logInfo("Przeglądarka została otworzona w trybie headless z rozmiarem 1600x800");
 
         } catch (Exception e) {
             LoggerUtil.logError("Błąd podczas otwierania przeglądarki.", e);
