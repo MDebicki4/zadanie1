@@ -1,12 +1,6 @@
 pipeline {
     agent any
-
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
         stage('Build') {
             steps {
                 sh 'mvn clean install'
@@ -14,17 +8,13 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh 'mvn failsafe:integration-test failsafe:verify'
+                sh 'mvn test'
             }
         }
     }
-
     post {
         always {
-            junit '**/target/failsafe-reports/*.xml'
-        }
-        failure {
-            echo 'Build failed. Check logs for details.'
+            junit '**/target/surefire-reports/*.xml'
         }
     }
 }
