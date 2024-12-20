@@ -58,6 +58,8 @@ public class StepDefinitions {
             Selenide.open("about:blank");
             WebDriver driver = Selenide.webdriver().driver().getWebDriver();
             LoggerUtil.logInfo("Przeglądarka została otworzona w trybie headless z rozmiarem 1600x800");
+            LoggerUtil.logInfo("Aktualny rozmiar okna: " +
+                    driver.manage().window().getSize());
         } catch (Exception e) {
             LoggerUtil.logError("Błąd podczas otwierania przeglądarki.", e);
             closeBrowserAndReportError(e);
