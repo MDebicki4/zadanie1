@@ -6,7 +6,7 @@ pipeline {
         jdk 'JDK 17'
     }
     environment {
-        MAVEN_OPTS = '-Dfile.encoding=UTF-8 -Dwebdriver.chrome.args=--headless'
+        MAVEN_OPTS = '-Dfile.encoding=UTF-8'
         LANG = 'en_US.UTF-8'
     }
 
