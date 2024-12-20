@@ -14,6 +14,7 @@ pipeline {
         }
         stage('Run Tests') {
             steps {
+             bat 'java -version'
                 bat 'mvn -v && mvn clean test -Dtest=org.example.RunnerTest'
             }
         }
