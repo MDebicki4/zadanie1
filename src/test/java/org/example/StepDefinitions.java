@@ -28,19 +28,16 @@ public class StepDefinitions {
     private void closeBrowserAndReportError(Exception e) {
         try {
             Selenide.closeWebDriver();
-            logger.info("Przeglądarka została zamknięta z powodu błędu.");
+            LoggerUtil.logInfo("Przeglądarka została zamknięta z powodu błędu.");
         } catch (Exception ex) {
-            logger.error("Błąd przy zamykaniu przeglądarki po wystąpieniu błędu: ", ex);
+            LoggerUtil.logError("Błąd przy zamykaniu przeglądarki po wystąpieniu błędu: ", ex);
         }
-        logger.error("Wystąpił błąd: ", e);
+        LoggerUtil.logError("Wystąpił błąd: ", e);
     }
 
     @Before
     public void beforeTest() {
-        logger.info("Rozpoczynam test...");
-        logger.info("This is an info message");
-        logger.error("This is an error message");
-        logger.debug("This is a debug message");
+        LoggerUtil.logInfo("Rozpoczynam test...");
     }
 
     @After
@@ -48,9 +45,9 @@ public class StepDefinitions {
         try {
             webdriver();
             Selenide.closeWebDriver();
-            logger.info("Przeglądarka została zamknięta.");
+            LoggerUtil.logInfo("Przeglądarka została zamknięta.");
         } catch (Exception e) {
-            logger.error("Wystąpił błąd podczas zamykania przeglądarki.", e);
+            LoggerUtil.logError("Wystąpił błąd podczas zamykania przeglądarki.", e);
         }
     }
 
@@ -61,13 +58,13 @@ public class StepDefinitions {
         System.out.println("Save page source enabled: " + Configuration.savePageSource);
         System.out.println("Reports folder: " + Configuration.reportsFolder);
         try {
-            logger.info("Otwieram przeglądarkę...");
+            LoggerUtil.logInfo("Otwieram przeglądarkę...");
             Selenide.open("about:blank");
             WebDriver driver = Selenide.webdriver().driver().getWebDriver();
             driver.manage().window().setSize(new Dimension(1600, 800));
-            logger.info("Przeglądarka została otworzona i zmieniono jej rozmiar na 1600x800");
+            LoggerUtil.logInfo("Przeglądarka została otworzona i zmieniono jej rozmiar na 1600x800");
         } catch (Exception e) {
-            logger.error("Błąd podczas otwierania przeglądarki.", e);
+            LoggerUtil.logError("Błąd podczas otwierania przeglądarki.", e);
             closeBrowserAndReportError(e);
             throw e;
         }
@@ -80,7 +77,7 @@ public class StepDefinitions {
 
     @Given("Przejdz na strone {string}")
     public void przejdzNaStrone(String url) {
-        logger.info("Przechodzę na stronę: {}", url);
+        LoggerUtil.logInfo("Przechodzę na stronę: {}", url);
         open(url);
         Selenide.screenshot("test_screenshot");
     }
@@ -88,7 +85,7 @@ public class StepDefinitions {
     @Then("Strona glowna jest widoczna")
     public void stronaGlownaJestWidoczna() {
         String title = com.codeborne.selenide.Selenide.title();
-        logger.info("Sprawdzam tytuł strony głównej: {}", title);
+        LoggerUtil.logInfo("Sprawdzam tytuł strony głównej: {}", title);
         assertTrue("Strona główna niewidoczna", title != null && !title.isEmpty());
 
         homePage.acceptCookies();
@@ -96,9 +93,9 @@ public class StepDefinitions {
         boolean isTextPresent = homePage.isTextPresentInFooter(expectedText);
 
         if (isTextPresent) {
-            logger.info("Tekst '{}' znaleziony w stopce strony", expectedText);
+            LoggerUtil.logInfo("Tekst '{}' znaleziony w stopce strony", expectedText);
         } else {
-            logger.error("Tekst '{}' nie został znaleziony w stopce strony", expectedText);
+            LoggerUtil.logError("Tekst '{}' nie został znaleziony w stopce strony", expectedText);
         }
 
         assertTrue("Tekst '" + expectedText + "' nie został znaleziony w stopce strony!", isTextPresent);
@@ -113,9 +110,9 @@ public class StepDefinitions {
     public void widocznaRozwijanaLista() {
         boolean isDropdownVisible = homePage.isDropdownVisible();
         if (isDropdownVisible) {
-            logger.info("Dropdown został rozwinięty.");
+            LoggerUtil.logInfo("Dropdown został rozwinięty.");
         } else {
-            logger.error("Dropdown nie został rozwinięty.");
+            LoggerUtil.logError("Dropdown nie został rozwinięty.");
         }
         assertTrue("Pierwszy dropdown się nie rozwinął", isDropdownVisible);
     }
@@ -144,13 +141,13 @@ public class StepDefinitions {
 
     @When("Dodaj produkt do koszyka")
     public void dodajProduktDoKoszyka() {
-        logger.info("Dodaję produkt do koszyka...");
+        LoggerUtil.logInfo("Dodaję produkt do koszyka...");
 
         int[] prices = productPage.addProductToCart();
         start = prices[0];
         rata = prices[1];
 
-        logger.info("Kwota początkowa: {}, Kwota miesięczna: {}", start, rata);
+        LoggerUtil.logInfo("Kwota początkowa: {}, Kwota miesięczna: {}", start, rata);
     }
 
     @Then("Widoczna strona Twoj koszyk")
@@ -161,11 +158,11 @@ public class StepDefinitions {
     @Then("Kwoty Cena na start oraz Rata miesieczna zgadzaja sie z kwotami z poprzedniej strony")
     public void kwotyZgadzaSie() {
         try {
-            logger.info("Sprawdzam, czy kwoty Cena na start oraz Rata miesięczna zgadzają się...");
+            LoggerUtil.logInfo("Sprawdzam, czy kwoty Cena na start oraz Rata miesięczna zgadzają się...");
             cartPage.verifyPricesMatch(start, rata);
-            logger.info("Kwoty na stronie koszyka zgadzają się z kwotami na poprzedniej stronie.");
+            LoggerUtil.logInfo("Kwoty na stronie koszyka zgadzają się z kwotami na poprzedniej stronie.");
         } catch (Exception e) {
-            logger.error("Błąd przy sprawdzaniu kwot na stronie koszyka.", e);
+            LoggerUtil.logError("Błąd przy sprawdzaniu kwot na stronie koszyka.", e);
             closeBrowserAndReportError(e);
             throw e;
         }
@@ -173,23 +170,23 @@ public class StepDefinitions {
 
     @When("Przejdz na strone glowna {string}")
     public void przejdzNaStroneGlowna(String url) {
-        logger.info("Przechodzę na stronę: {}", url);
+        LoggerUtil.logInfo("Przechodzę na stronę: {}", url);
         open(url);
     }
 
     @Then("Widoczna strona glowna")
     public void widocznaStronaGlowna() {
         String title = com.codeborne.selenide.Selenide.title();
-        logger.info("Sprawdzam tytuł strony głównej: {}", title);
+        LoggerUtil.logInfo("Sprawdzam tytuł strony głównej: {}", title);
         assertTrue("Strona główna niewidoczna", title != null && !title.isEmpty());
 
         String expectedText = "T‑Mobile Polska S.A. Wszystkie prawa zastrzeżone";
         boolean isTextPresent = homePage.isTextPresentInFooter(expectedText);
 
         if (isTextPresent) {
-            logger.info("Tekst '{}' znaleziony w stopce strony", expectedText);
+            LoggerUtil.logInfo("Tekst '{}' znaleziony w stopce strony", expectedText);
         } else {
-            logger.error("Tekst '{}' nie został znaleziony w stopce strony", expectedText);
+            LoggerUtil.logError("Tekst '{}' nie został znaleziony w stopce strony", expectedText);
         }
 
         assertTrue("Tekst '" + expectedText + "' nie został znaleziony w stopce strony!", isTextPresent);
@@ -200,7 +197,7 @@ public class StepDefinitions {
         String tekstKoszyk = $("a[title='Koszyk']").text();
         String liczbaTekst = tekstKoszyk.replaceAll("[^0-9]", "");
         int liczbaKoszyk = Integer.parseInt(liczbaTekst);
-        logger.info("Liczba produktów w koszyku: {}", liczbaKoszyk);
+        LoggerUtil.logInfo("Liczba produktów w koszyku: {}", liczbaKoszyk);
         assertEquals("Liczba w koszyku nie wynosi 1!", 1, liczbaKoszyk);
     }
 }
