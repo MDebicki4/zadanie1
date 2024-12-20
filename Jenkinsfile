@@ -7,6 +7,7 @@ pipeline {
     }
     environment {
         MAVEN_OPTS = '-Dfile.encoding=UTF-8'
+        JAVA_TOOL_OPTIONS = '-Dfile.encoding=UTF-8'
         LANG = 'en_US.UTF-8'
     }
 
@@ -14,7 +15,11 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    bat 'mvn clean install'
+                    bat """
+                    chcp 65001 > nul
+                    set MAVEN_OPTS=-Dfile.encoding=UTF-8
+                    mvn clean install
+                    """
                 }
             }
         }
@@ -22,7 +27,11 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    bat 'mvn clean test'
+                    bat """
+                    chcp 65001 > nul
+                    set MAVEN_OPTS=-Dfile.encoding=UTF-8
+                    mvn clean test
+                    """
                 }
             }
         }
