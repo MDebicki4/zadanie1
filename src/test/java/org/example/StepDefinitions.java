@@ -55,6 +55,9 @@ public class StepDefinitions {
             WebDriver driver = Selenide.webdriver().driver().getWebDriver();
             driver.manage().window().setSize(new Dimension(1600, 800));
             LoggerUtil.logInfo("Przeglądarka została otworzona i zmieniono jej rozmiar na 1600x800");
+            Dimension currentSize = driver.manage().window().getSize();
+            LoggerUtil.logInfo("Aktualna rozdzielczość okna przeglądarki: " +
+                    currentSize.getWidth() + "x" + currentSize.getHeight());
         } catch (Exception e) {
             LoggerUtil.logError("Błąd podczas otwierania przeglądarki.", e);
             closeBrowserAndReportError(e);
