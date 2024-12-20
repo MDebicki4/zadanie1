@@ -3,18 +3,15 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'mvn clean install'
+                bat 'echo "Building project"'
+                bat 'build_script.bat'
             }
         }
         stage('Test') {
             steps {
-                sh 'mvn test'
+                bat 'echo "Running tests"'
+                bat 'run_tests.bat'
             }
-        }
-    }
-    post {
-        always {
-            junit '**/target/surefire-reports/*.xml'
         }
     }
 }
