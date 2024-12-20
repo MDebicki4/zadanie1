@@ -80,7 +80,7 @@
                 <configuration>
                     <useModulePath>false</useModulePath>
                     <includes>
-                        <include>**/*Test.java</include> <!-- Wybierz testy, które kończą się na "Test" -->
+                        <include>**/*Test.java</include>
                     </includes>
                 </configuration>
             </plugin>
