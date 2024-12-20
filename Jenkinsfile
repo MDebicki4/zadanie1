@@ -5,6 +5,9 @@ pipeline {
         maven 'Maven3'
         jdk 'JDK 17'
     }
+        environment {
+            MAVEN_OPTS = '-Dfile.encoding=UTF-8'
+        }
 
     stages {
         stage('Checkout') {
@@ -15,7 +18,7 @@ pipeline {
         stage('Run Tests') {
             steps {
              bat 'java -version'
-                bat 'mvn clean test -Dfile.encoding=UTF-8'
+                bat 'mvn clean test'
             }
         }
     }
